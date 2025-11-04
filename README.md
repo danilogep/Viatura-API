@@ -1,0 +1,146 @@
+# 🚀 ViaturaAPI: Gerenciamento de Viaturas da PRF
+
+Bem-vindo à **ViaturaAPI**, uma API RESTful desenvolvida em Python com FastAPI, projetada para gerenciar eficientemente as viaturas da Polícia Rodoviária Federal (PRF), seus planos de manutenção e as unidades operacionais.
+
+Este projeto foi construído para demonstrar conceitos modernos de desenvolvimento de APIs, incluindo integração com banco de dados PostgreSQL, gerenciamento de migrações com Alembic, paginação de resultados e tratamento de erros customizado.
+
+### 🌟 Funcionalidades Principais
+
+* **Gestão de Viaturas:** Cadastre, consulte, atualize e remova viaturas, associando-as a unidades operacionais e planos de manutenção.
+* **Gestão de Unidades Operacionais (UOPs):** Administre as diferentes unidades operacionais da PRF.
+* **Gestão de Planos de Manutenção:** Crie e gerencie os planos de manutenção para as viaturas.
+* **Validação Inteligente:** Garante que não haja duplicidade de placas ao cadastrar viaturas.
+* **Paginação e Filtros:** Facilita a consulta de grandes volumes de dados, permitindo filtros por diversos critérios e paginação eficiente.
+* **Resposta Customizada:** Retorna dados de viaturas de forma simplificada e relevante para o usuário final, incluindo detalhes da UOP e do Plano de Manutenção.
+
+---
+
+### 💻 Tecnologias Utilizadas
+
+* **Python 3.12+**
+* **FastAPI:** Framework moderno e rápido para construção de APIs.
+* **SQLAlchemy 2.0:** ORM (Object-Relational Mapper) robusto para interação com o banco de dados.
+* **Alembic:** Ferramenta de migração de banco de dados para gerenciar o esquema.
+* **PostgreSQL:** Banco de dados relacional.
+* **Docker & Docker Compose:** Para orquestração e ambiente de desenvolvimento.
+* **Pydantic:** Para validação de dados e configurações.
+* **FastAPI Pagination:** Para adicionar paginação aos endpoints.
+
+---
+
+### 🚀 Primeiros Passos
+
+Siga estas instruções para configurar e executar a ViaturaAPI em seu ambiente local.
+
+#### 1. Pré-requisitos
+
+Certifique-se de ter os seguintes programas instalados em sua máquina:
+
+* **Python 3.12+**: [Download Python](https://www.python.org/downloads/)
+* **Docker Desktop**: [Download Docker](https://www.docker.com/products/docker-desktop/) (Inclui Docker Compose)
+* **Git**: [Download Git](https://git-scm.com/downloads)
+
+#### 2. Clone o Repositório
+
+Abra seu terminal (PowerShell no Windows, Terminal no Linux/macOS) e clone este repositório:
+
+```bash
+git clone [https://github.com/seu-usuario/Viatura_API.git](https://github.com/seu-usuario/Viatura_API.git)
+cd Viatura_API
+```
+
+#### 3. Configuração do Ambiente
+
+##### a. Ambiente Virtual
+
+Crie e ative um ambiente virtual para o projeto:
+
+```bash
+# Criar o ambiente virtual
+python -m venv venv
+
+# Ativar o ambiente virtual (Windows PowerShell)
+.\venv\Scripts\Activate.ps1
+
+# Ativar o ambiente virtual (Linux/macOS)
+# source venv/bin/activate
+```
+
+##### b. Instale as Dependências
+
+Com o ambiente virtual ativado, instale todas as bibliotecas necessárias:
+
+```bash
+pip install -r requirements.txt
+```
+
+#### 4. Inicie o Banco de Dados (PostgreSQL com Docker)
+
+Nós usamos Docker para manter o banco de dados isolado e fácil de configurar.
+
+```bash
+docker compose up -d
+```
+
+Este comando irá baixar a imagem do PostgreSQL (se ainda não tiver) e iniciar o container do banco de dados em segundo plano.
+
+#### 5. Execute as Migrações do Banco de Dados
+
+Com o banco de dados rodando, use o Alembic para criar as tabelas no PostgreSQL:
+
+```bash
+alembic upgrade head
+```
+
+Você verá mensagens informando que as tabelas `plano_de_manutencaos`, `unidade_operacionals` e `viaturas` foram criadas.
+
+---
+
+### 🌐 Utilizando a API
+
+Com todas as configurações feitas, é hora de rodar a API e começar a interagir com ela!
+
+#### 1. Inicie o Servidor da API
+
+No seu terminal (com o ambiente virtual ainda ativado), inicie o servidor FastAPI:
+
+```bash
+uvicorn main:app --reload --port 8000
+```
+
+Você verá uma mensagem indicando que o Uvicorn está rodando em `http://127.0.0.1:8000`.
+
+#### 2. Acesse a Documentação Interativa (Swagger UI)
+
+Abra seu navegador e acesse a documentação interativa da API:
+
+➡️ **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**
+
+Você também pode acessar a documentação ReDoc em [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc).
+
+Aqui você encontrará todos os *endpoints* disponíveis, exemplos de requisições e poderá testar a API diretamente pelo navegador.
+
+---
+
+### 🛑 Parando o Ambiente
+
+Para parar o servidor FastAPI, pressione `CTRL + C` no terminal onde ele está rodando.
+
+Para parar e remover os containers do Docker (e opcionalmente os dados do banco de dados), use:
+
+```bash
+# Para parar os containers
+docker compose stop
+
+# Para parar e remover os containers e a rede (mantém os dados)
+docker compose down
+
+# Para parar e remover TUDO (containers, rede, e VOLUMES com os dados do banco!)
+docker compose down -v
+```
+
+---
+
+### 🤝 Contribuição
+
+Contribuições são bem-vindas! Sinta-se à vontade para abrir *issues* ou enviar *pull requests*.

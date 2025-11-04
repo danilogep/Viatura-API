@@ -1,0 +1,18 @@
+# Ambiente Virtual
+venv/
+.venv/
+env/
+*.env
+
+# Arquivos compilados do Python
+__pycache__/
+*.pyc
+
+# Arquivos de IDE (VS Code)
+.vscode/
+
+# Arquivos de cache Alembic
+.alembic_cache/
+
+# Arquivos do Docker (se houver)
+.dockerignore

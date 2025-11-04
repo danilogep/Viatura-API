@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: viatura_api_db
+    ports:
+      - "5432:5432"
+    environment:
+      # --- SUAS NOVAS CREDENCIAIS ---
+      - POSTGRES_USER=prf_user
+      - POSTGRES_PASSWORD=prf_pass
+      - POSTGRES_DB=viatura_db
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data:
+    driver: local
