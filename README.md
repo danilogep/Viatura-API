@@ -4,28 +4,39 @@ Bem-vindo à **ViaturaAPI**, uma API RESTful desenvolvida em Python com FastAPI,
 
 Este projeto foi construído para demonstrar conceitos modernos de desenvolvimento de APIs, incluindo integração com banco de dados PostgreSQL, gerenciamento de migrações com Alembic, paginação de resultados e tratamento de erros customizado.
 
+---
+
 ### 🌟 Funcionalidades Principais
 
-* **Gestão de Viaturas:** Cadastre, consulte, atualize e remova viaturas, associando-as a unidades operacionais e planos de manutenção.
-* **Gestão de Unidades Operacionais (UOPs):** Administre as diferentes unidades operacionais da PRF.
-* **Gestão de Planos de Manutenção:** Crie e gerencie os planos de manutenção para as viaturas.
-* **Validação Inteligente:** Garante que não haja duplicidade de placas ao cadastrar viaturas.
-* **Paginação e Filtros:** Facilita a consulta de grandes volumes de dados, permitindo filtros por diversos critérios e paginação eficiente.
-* **Resposta Customizada:** Retorna dados de viaturas de forma simplificada e relevante para o usuário final, incluindo detalhes da UOP e do Plano de Manutenção.
+* **🚗 Gestão Completa de Viaturas:**
+    * Cadastro detalhado com **Placa, Marca, Modelo, Cor e Ano**.
+    * Sistema inteligente que impede duplicidade de placas.
+    * Busca avançada e filtros dinâmicos.
+
+* **💰 Controle Financeiro de Manutenção:**
+    * Cadastro de Planos de Manutenção (ex: "Revisão de Freios").
+    * **Novidade:** Registro de custos estimados para cálculos orçamentários futuros.
+
+* **🏢 Logística Operacional (UOPs):**
+    * Gestão de Unidades Operacionais.
+    * Controle de alocação: saiba exatamente onde cada viatura está lotada.
+
+* **🛡️ Segurança e Performance:**
+    * Proteção contra credenciais expostas (Environment Variables).
+    * Tratamento robusto de erros de banco de dados (Integrity Errors).
+    * Paginação automática para lidar com grandes volumes de dados.
 
 ---
 
 ### 💻 Tecnologias Utilizadas
 
-* **Python 3.12+**
-* **FastAPI:** Framework moderno e rápido para construção de APIs.
-* **SQLAlchemy 2.0:** ORM (Object-Relational Mapper) robusto para interação com o banco de dados.
-* **Alembic:** Ferramenta de migração de banco de dados para gerenciar o esquema.
-* **PostgreSQL:** Banco de dados relacional.
-* **Docker & Docker Compose:** Para orquestração e ambiente de desenvolvimento.
-* **Pydantic:** Para validação de dados e configurações.
-* **FastAPI Pagination:** Para adicionar paginação aos endpoints.
-
+* **Linguagem:** Python 3.12+
+* **Framework:** FastAPI (Alta performance e validação automática).
+* **Banco de Dados:** PostgreSQL (via Docker).
+* **ORM:** SQLAlchemy 2.0 (Gerenciamento de dados assíncrono).
+* **Migrações:** Alembic (Controle de versão do banco de dados).
+* **Ambiente:** Docker & Docker Compose.
+* **Validação:** Pydantic (Segurança e tipagem de dados).
 ---
 
 ### 🚀 Primeiros Passos

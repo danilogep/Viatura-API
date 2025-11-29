@@ -16,11 +16,16 @@ class PlanoDeManutencaoBase(BaseSchema):
         example="Troca de óleo, filtros e verificação de freios", 
         max_length=300
     )
+    # Adicionamos o campo no Schema para validação e documentação
+    valor_estimado: float = Field(
+        description="Custo estimado da manutenção (R$)",
+        example=450.00,
+        gt=0 # Validação: O valor deve ser maior que zero
+    )
 
 class PlanoDeManutencaoIn(PlanoDeManutencaoBase):
     """
     Schema de entrada (criação) para Plano de Manutenção.
-    Não tem campos extras além do Base.
     """
     pass
 

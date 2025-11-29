@@ -1,6 +1,6 @@
 from contrib.models import BaseModel
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String
+from sqlalchemy import String, Float # Importamos Float para valores monetários
 from typing import List 
 
 class PlanoDeManutencaoModel(BaseModel):
@@ -8,6 +8,7 @@ class PlanoDeManutencaoModel(BaseModel):
 
     nome: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     descricao: Mapped[str] = mapped_column(String(300), nullable=False)
+    valor_estimado: Mapped[float] = mapped_column(Float, nullable=False)
     
     # Usar o nome da CLASSE como string
     viaturas: Mapped[List["ViaturaModel"]] = relationship(

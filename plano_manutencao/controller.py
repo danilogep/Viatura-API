@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.exc import IntegrityError # Importante para tratar erros de banco
 from contrib.database import get_db_session
 from plano_manutencao.models import PlanoDeManutencaoModel
 from plano_manutencao.schemas import PlanoDeManutencaoIn, PlanoDeManutencaoOut
@@ -16,25 +17,31 @@ async def create_plano(
     """
     Cria um novo Plano de Manutenção no banco de dados.
     """
-    
-    # Verifica se já existe um plano com o mesmo nome
-    result = await db_session.execute(
-        select(PlanoDeManutencaoModel).where(PlanoDeManutencaoModel.nome == plano_in.nome)
-    )
-    if result.scalars().first():
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Já existe um plano com o nome: {plano_in.nome}"
-        )
-
+    # Criamos o objeto modelo diretamente com os dados validados
     novo_plano = PlanoDeManutencaoModel(**plano_in.model_dump())
-    db_session.add(novo_plano)
-    await db_session.commit()
-    await db_session.refresh(novo_plano)
     
-    # Retorna o objeto criado usando o schema de saída
-    return PlanoDeManutencaoOut.model_validate(novo_plano)
-
+    try:
+        db_session.add(novo_plano)
+        await db_session.commit()
+        await db_session.refresh(novo_plano)
+        
+        return PlanoDeManutencaoOut.model_validate(novo_plano)
+        
+    except IntegrityError as e:
+        # Se o banco reclamar de duplicidade, capturamos aqui
+        await db_session.rollback() # Desfaz a transação que falhou
+        
+        # Verifica se o erro é sobre a chave única de 'nome'
+        if "plano_de_manutencaos_nome_key" in str(e) or "unique constraint" in str(e).lower():
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Já existe um plano com o nome: {plano_in.nome}"
+            )
+        # Se for outro erro de integridade desconhecido
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erro de integridade ao salvar o plano."
+        )
 
 @router.get('/', summary='Listar todos os Planos de Manutenção')
 async def get_all_planos(
@@ -47,7 +54,6 @@ async def get_all_planos(
     planos = result.scalars().all()
     
     return [PlanoDeManutencaoOut.model_validate(plano) for plano in planos]
-
 
 @router.get('/{id}', summary='Consultar Plano por ID')
 async def get_plano_by_id(

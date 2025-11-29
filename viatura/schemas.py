@@ -3,24 +3,32 @@ from pydantic import Field
 from unidade_operacional.schemas import UnidadeOperacionalOut
 from plano_manutencao.schemas import PlanoDeManutencaoOut
 
-# --- Schema Base ---
 class ViaturaBase(BaseSchema):
     placa: str = Field(
         description="Placa da viatura", 
         example="QRF1E23", 
         max_length=7
     )
+    marca: str = Field(
+        description="Marca da viatura",
+        example="Chevrolet",
+        max_length=50
+    )
     modelo: str = Field(
         description="Modelo da viatura", 
-        example="Chevrolet Trailblazer", 
+        example="Trailblazer", 
         max_length=50
+    )
+    cor: str = Field(
+        description="Cor da viatura",
+        example="Branca",
+        max_length=20
     )
     ano_fabricacao: int = Field(
         description="Ano de fabricação", 
         example=2021
     )
 
-# --- Schema de Entrada (POST) ---
 class ViaturaIn(ViaturaBase):
     """
     Schema de entrada (criação) para Viatura.
@@ -35,7 +43,6 @@ class ViaturaIn(ViaturaBase):
         example=1
     )
 
-# --- Schema de Saída Padrão (GET by ID) ---
 class ViaturaOut(ViaturaBase):
     """
     Schema de saída (retorno) para Viatura.
@@ -49,15 +56,14 @@ class ViaturaOut(ViaturaBase):
         description="Plano de Manutenção da viatura"
     )
 
-# --- Schema de Saída (GET ALL) - Desafio Final ---
-# Este schema é customizado para atender o desafio "customizar response de retorno de endpoints - get all"
 class ViaturaListOut(BaseSchema):
     """
-    Schema customizado para a listagem (GET ALL) de Viaturas,
-    conforme requisito do desafio.
+    Schema customizado para a listagem (GET ALL) de Viaturas.
     """
     placa: str = Field(description="Placa da viatura", example="QRF1E23")
-    modelo: str = Field(description="Modelo da viatura", example="Chevrolet Trailblazer")
+    marca: str = Field(description="Marca da viatura", example="Chevrolet")
+    modelo: str = Field(description="Modelo da viatura", example="Trailblazer")
+    cor: str = Field(description="Cor da viatura", example="Branca")
     
     # Vamos criar schemas aninhados simples que contêm apenas o nome
     class UnidadeOperacionalInfo(BaseSchema):

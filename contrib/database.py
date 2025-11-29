@@ -1,16 +1,15 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict # Importando ConfigDict para configurações extras
 import os
 
-# --- URL DE CONEXÃO ATUALIZADA ---
-# Formato: postgresql+asyncpg://USUARIO:SENHA@HOST:PORTA/NOME_DO_BANCO
-DB_CONNECTION_STRING = "postgresql+asyncpg://prf_user:prf_pass@localhost:5432/viatura_db"
-
-
 class Settings(BaseSettings):
-    # Tenta pegar do ambiente, se não, usa a string que definimos acima
-    DB_URL: str = os.getenv("DB_URL", DB_CONNECTION_STRING)
+    # Configuração do Pydantic para ler variáveis de ambiente
+    # Caso não encontre no sistema, usa o valor padrão definido abaixo.
+    # OBS: Em produção, JAMAIS deixe senhas padrão aqui. Passe via .env ou variáveis de sistema.
+    DB_URL: str = "postgresql+asyncpg://prf_user:prf_pass@localhost:5432/viatura_db"
+    
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 settings = Settings()
 
