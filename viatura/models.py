@@ -6,23 +6,15 @@ class ViaturaModel(BaseModel):
     __tablename__ = 'viaturas' 
     
     placa: Mapped[str] = mapped_column(String(7), unique=True, nullable=False, index=True)
-    # Adicionando Marca (ex: Chevrolet, Toyota)
     marca: Mapped[str] = mapped_column(String(50), nullable=False)
     modelo: Mapped[str] = mapped_column(String(50), nullable=False)
-    # Adicionando Cor (ex: Branca, Azul)
     cor: Mapped[str] = mapped_column(String(20), nullable=False)
     ano_fabricacao: Mapped[int] = mapped_column(Integer, nullable=False)
+    
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="OPERACAO")
 
-    unidade_operacional_id: Mapped[int] = mapped_column(
-        ForeignKey("unidade_operacionals.id"), nullable=False
-    )
-    unidade_operacional: Mapped["UnidadeOperacionalModel"] = relationship(
-        "UnidadeOperacionalModel", back_populates="viaturas"
-    )
+    unidade_operacional_id: Mapped[int] = mapped_column(ForeignKey("unidade_operacionals.id"), nullable=False)
+    unidade_operacional: Mapped["UnidadeOperacionalModel"] = relationship("UnidadeOperacionalModel", back_populates="viaturas")
 
-    plano_manutencao_id: Mapped[int] = mapped_column(
-        ForeignKey("plano_de_manutencaos.id"), nullable=False
-    )
-    plano_manutencao: Mapped["PlanoDeManutencaoModel"] = relationship(
-        "PlanoDeManutencaoModel", back_populates="viaturas"
-    )
+    plano_manutencao_id: Mapped[int] = mapped_column(ForeignKey("plano_de_manutencaos.id"), nullable=False)
+    plano_manutencao: Mapped["PlanoDeManutencaoModel"] = relationship("PlanoDeManutencaoModel", back_populates="viaturas")

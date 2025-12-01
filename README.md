@@ -1,30 +1,36 @@
 # 🚀 ViaturaAPI: Gerenciamento de Viaturas da PRF
 
+[![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com)
+
 Bem-vindo à **ViaturaAPI**, uma API RESTful desenvolvida em Python com FastAPI, projetada para gerenciar eficientemente as viaturas da Polícia Rodoviária Federal (PRF), seus planos de manutenção e as unidades operacionais.
 
 Este projeto foi construído para demonstrar conceitos modernos de desenvolvimento de APIs, incluindo integração com banco de dados PostgreSQL, gerenciamento de migrações com Alembic, paginação de resultados e tratamento de erros customizado.
 
+> **Nota:** Este repositório contém o BACKEND (API). Para ver a interface visual, acesse o repositório do Frontend.
+
 ---
 
-### 🌟 Funcionalidades Principais
+### 🌟 Novas Funcionalidades (v2.0)
 
-* **🚗 Gestão Completa de Viaturas:**
-    * Cadastro detalhado com **Placa, Marca, Modelo, Cor e Ano**.
-    * Sistema inteligente que impede duplicidade de placas.
-    * Busca avançada e filtros dinâmicos.
+* **💰 Inteligência Financeira:**
+    * Cálculo automático de previsão orçamentária baseado nos planos de manutenção ativos.
+    * Registro de valores estimados para serviços preventivos e corretivos.
 
-* **💰 Controle Financeiro de Manutenção:**
-    * Cadastro de Planos de Manutenção (ex: "Revisão de Freios").
-    * **Novidade:** Registro de custos estimados para cálculos orçamentários futuros.
+* **🚦 Controle de Status Operacional:**
+    * Monitoramento em tempo real: Saiba quantas viaturas estão **"Em Operação"** vs **"Em Manutenção"**.
+    * Lógica de negócios para impedir alocação de viaturas baixadas.
 
-* **🏢 Logística Operacional (UOPs):**
-    * Gestão de Unidades Operacionais.
-    * Controle de alocação: saiba exatamente onde cada viatura está lotada.
+* **🔍 Filtros Avançados:**
+    * Busca otimizada por Placa, Modelo e Status.
+    * Paginação eficiente para grandes volumes de dados.
 
-* **🛡️ Segurança e Performance:**
-    * Proteção contra credenciais expostas (Environment Variables).
-    * Tratamento robusto de erros de banco de dados (Integrity Errors).
-    * Paginação automática para lidar com grandes volumes de dados.
+* **🛡️ Segurança e Robustez:**
+    * Tratamento de erros de banco de dados (Integrity Error).
+    * Prevenção contra Race Conditions (Condição de Corrida) no cadastro.
+    * Configuração segura de CORS para integração com Frontend moderno.
 
 ---
 
@@ -91,6 +97,9 @@ Nós usamos Docker para manter o banco de dados isolado e fácil de configurar.
 
 ```bash
 docker compose up -d
+
+# 2. Criar tabelas e popular dados (Seed)
+python seed.py
 ```
 
 Este comando irá baixar a imagem do PostgreSQL (se ainda não tiver) e iniciar o container do banco de dados em segundo plano.
@@ -149,6 +158,11 @@ docker compose down
 # Para parar e remover TUDO (containers, rede, e VOLUMES com os dados do banco!)
 docker compose down -v
 ```
+
+---
+
+### 🤝 Integração Frontend
+Este backend foi desenhado para alimentar o *Viatura Frontend*, desenvolvido em React + TypeScript. Certifique-se de que este backend esteja rodando na porta 8000 para que o frontend funcione corretamente.
 
 ---
 
