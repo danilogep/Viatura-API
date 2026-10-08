@@ -1,6 +1,8 @@
 fastapi
 uvicorn[standard]
-sqlalchemy
+# O extra [asyncio] traz o greenlet. A partir do SQLAlchemy 2.1 ele deixou de
+# ser dependencia direta, e sem ele o import de sqlalchemy.ext.asyncio falha.
+sqlalchemy[asyncio]>=2.0
 alembic
 pydantic
 pydantic-settings
