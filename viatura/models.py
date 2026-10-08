@@ -1,6 +1,14 @@
-from contrib.models import BaseModel
+from typing import TYPE_CHECKING
+
+from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Integer, ForeignKey
+
+from contrib.models import BaseModel
+
+if TYPE_CHECKING:  # evita import circular em tempo de execucao
+    from plano_manutencao.models import PlanoDeManutencaoModel
+    from unidade_operacional.models import UnidadeOperacionalModel
+
 
 class ViaturaModel(BaseModel):
     __tablename__ = 'viaturas' 

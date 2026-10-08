@@ -1,9 +1,10 @@
-import sys
 import os
+import sys
 from logging.config import fileConfig
+
 from sqlalchemy.ext.asyncio import create_async_engine
+
 from alembic import context
-import asyncio
 
 # Adiciona o diretório raiz do projeto ao sys.path
 # Isso permite que o Alembic encontre 'contrib', 'viatura', etc.
@@ -17,13 +18,10 @@ sys.path.insert(0, project_dir)
 
 # --- NOSSA CONFIGURAÇÃO ---
 # Importar a URL do banco e a Base dos nossos models
-from contrib.database import settings  # Importa nossas configurações (que têm o DB_URL)
-from contrib.models import Base        # Importa nossa Base(Model)
-
 # Importar todos os models para que o Alembic "veja" eles
-import plano_manutencao.models
-import unidade_operacional.models
-import viatura.models
+from contrib.database import settings  # Importa nossas configurações (que têm o DB_URL)
+from contrib.models import Base  # Importa nossa Base(Model)
+
 # -------------------------
 
 # Esta é a configuração do Alembic

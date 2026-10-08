@@ -1,16 +1,70 @@
+# Sobe a pilha inteira — banco, API e interface — com `docker compose up --build`.
+#
+# O frontend vive em outro repositório (viatura-frontend). Clone os dois lado a
+# lado ou aponte FRONTEND_PATH no .env para onde ele estiver.
+
 services:
   db:
     image: postgres:15-alpine
-    container_name: viatura_api_db
+    container_name: viatura_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-viatura}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-viatura}
+      POSTGRES_DB: ${POSTGRES_DB:-viatura_db}
     ports:
       - "5432:5432"
-    environment:
-      # --- SUAS NOVAS CREDENCIAIS ---
-      - POSTGRES_USER=prf_user
-      - POSTGRES_PASSWORD=prf_pass
-      - POSTGRES_DB=viatura_db
     volumes:
       - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      # A API só sobe depois que o Postgres aceita conexão; sem isso o primeiro
+      # start quebra na corrida entre os dois containers.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-viatura} -d ${POSTGRES_DB:-viatura_db}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    container_name: viatura_api
+    environment:
+      DB_URL: postgresql+asyncpg://${POSTGRES_USER:-viatura}:${POSTGRES_PASSWORD:-viatura}@db:5432/${POSTGRES_DB:-viatura_db}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
+      SQL_ECHO: ${SQL_ECHO:-false}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  seed:
+    # Popula o banco uma vez e encerra. Roda sob o perfil `seed` para não
+    # recriar as tabelas a cada `up`: `docker compose --profile seed up seed`.
+    build: .
+    profiles: ["seed"]
+    environment:
+      DB_URL: postgresql+asyncpg://${POSTGRES_USER:-viatura}:${POSTGRES_PASSWORD:-viatura}@db:5432/${POSTGRES_DB:-viatura_db}
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["python", "seed.py"]
+
+  frontend:
+    build:
+      context: ${FRONTEND_PATH:-../viatura-frontend}
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    container_name: viatura_frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      api:
+        condition: service_healthy
 
 volumes:
   pg_data:

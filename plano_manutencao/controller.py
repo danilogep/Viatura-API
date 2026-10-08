@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.exc import IntegrityError  # Importante para tratar erros de banco
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.exc import IntegrityError # Importante para tratar erros de banco
+
 from contrib.database import get_db_session
 from plano_manutencao.models import PlanoDeManutencaoModel
 from plano_manutencao.schemas import PlanoDeManutencaoIn, PlanoDeManutencaoOut
@@ -27,21 +28,21 @@ async def create_plano(
         
         return PlanoDeManutencaoOut.model_validate(novo_plano)
         
-    except IntegrityError as e:
+    except IntegrityError as erro:
         # Se o banco reclamar de duplicidade, capturamos aqui
         await db_session.rollback() # Desfaz a transação que falhou
         
         # Verifica se o erro é sobre a chave única de 'nome'
-        if "plano_de_manutencaos_nome_key" in str(e) or "unique constraint" in str(e).lower():
+        if "plano_de_manutencaos_nome_key" in str(erro) or "unique constraint" in str(erro).lower():
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"Já existe um plano com o nome: {plano_in.nome}"
-            )
+            ) from None
         # Se for outro erro de integridade desconhecido
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Erro de integridade ao salvar o plano."
-        )
+        ) from erro
 
 @router.get('/', summary='Listar todos os Planos de Manutenção')
 async def get_all_planos(

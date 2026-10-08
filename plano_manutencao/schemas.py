@@ -1,5 +1,7 @@
-from contrib.schemas import BaseSchema
 from pydantic import Field
+
+from contrib.schemas import BaseSchema
+
 
 class PlanoDeManutencaoBase(BaseSchema):
     """
@@ -8,18 +10,18 @@ class PlanoDeManutencaoBase(BaseSchema):
     """
     nome: str = Field(
         description="Nome do plano de manutenção", 
-        example="Revisão Preventiva 10.000km", 
+        examples=["Revisão Preventiva 10.000km"],
         max_length=100
     )
     descricao: str = Field(
         description="Descrição detalhada do plano", 
-        example="Troca de óleo, filtros e verificação de freios", 
+        examples=["Troca de óleo, filtros e verificação de freios"],
         max_length=300
     )
     # Adicionamos o campo no Schema para validação e documentação
     valor_estimado: float = Field(
         description="Custo estimado da manutenção (R$)",
-        example=450.00,
+        examples=[450.00],
         gt=0 # Validação: O valor deve ser maior que zero
     )
 

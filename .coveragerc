@@ -1,0 +1,10 @@
+[run]
+# SQLAlchemy async alterna para greenlets ao executar o IO; sem declarar isso o
+# coverage deixa de rastrear boa parte do corpo dos controllers e reporta a menos.
+concurrency = greenlet,thread
+source = contrib,main,plano_manutencao,unidade_operacional,viatura
+omit = */tests/*,*/venv/*,*/alembic/*
+
+[report]
+show_missing = true
+skip_covered = false

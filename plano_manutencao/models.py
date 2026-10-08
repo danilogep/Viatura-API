@@ -1,7 +1,14 @@
-from contrib.models import BaseModel
+
+from typing import TYPE_CHECKING
+
+from sqlalchemy import Float, String  # Importamos Float para valores monetários
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Float # Importamos Float para valores monetários
-from typing import List 
+
+from contrib.models import BaseModel
+
+if TYPE_CHECKING:  # evita import circular em tempo de execucao
+    from viatura.models import ViaturaModel
+
 
 class PlanoDeManutencaoModel(BaseModel):
     __tablename__ = 'plano_de_manutencaos'
@@ -11,6 +18,6 @@ class PlanoDeManutencaoModel(BaseModel):
     valor_estimado: Mapped[float] = mapped_column(Float, nullable=False)
     
     # Usar o nome da CLASSE como string
-    viaturas: Mapped[List["ViaturaModel"]] = relationship(
+    viaturas: Mapped[list["ViaturaModel"]] = relationship(
         "ViaturaModel", back_populates="plano_manutencao"
     )

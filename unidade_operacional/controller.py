@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.exc import IntegrityError  # Importação necessária
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.exc import IntegrityError # Importação necessária
+
 from contrib.database import get_db_session
 from unidade_operacional.models import UnidadeOperacionalModel
 from unidade_operacional.schemas import UnidadeOperacionalIn, UnidadeOperacionalOut
@@ -26,19 +27,19 @@ async def create_uop(
         
         return UnidadeOperacionalOut.model_validate(nova_uop)
 
-    except IntegrityError as e:
+    except IntegrityError as erro:
         # Tratamento de erro de duplicidade robusto
         await db_session.rollback()
         # Verifica se o erro é no campo 'nome'
-        if "unidade_operacionals_nome_key" in str(e) or "unique constraint" in str(e).lower():
+        if "unidade_operacionals_nome_key" in str(erro) or "unique constraint" in str(erro).lower():
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"Já existe uma UOP com o nome: {uop_in.nome}"
-            )
+            ) from None
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Erro interno ao criar Unidade Operacional."
-        )
+        ) from erro
 
 
 @router.get('/', summary='Listar todas as Unidades Operacionais')

@@ -2,17 +2,30 @@
 venv/
 .venv/
 env/
+
+# Variáveis de ambiente (o .env.example é versionado, o .env nunca)
+.env
 *.env
+!.env.example
 
 # Arquivos compilados do Python
 __pycache__/
 *.pyc
 
-# Arquivos de IDE (VS Code)
+# Testes e cobertura
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.ruff_cache/
+
+# Banco local de desenvolvimento
+*.db
+*.sqlite3
+
+# IDE
 .vscode/
+.idea/
 
-# Arquivos de cache Alembic
+# Alembic
 .alembic_cache/
-
-# Arquivos do Docker (se houver)
-.dockerignore

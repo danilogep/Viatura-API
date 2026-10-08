@@ -1,5 +1,7 @@
-from contrib.schemas import BaseSchema
 from pydantic import Field
+
+from contrib.schemas import BaseSchema
+
 
 class UnidadeOperacionalBase(BaseSchema):
     """
@@ -7,12 +9,12 @@ class UnidadeOperacionalBase(BaseSchema):
     """
     nome: str = Field(
         description="Nome da Unidade Operacional", 
-        example="UOP Garanhuns", 
+        examples=["UOP Garanhuns"],
         max_length=100
     )
     municipio: str = Field(
         description="Município onde a UOP está localizada", 
-        example="Garanhuns", 
+        examples=["Garanhuns"],
         max_length=100
     )
 

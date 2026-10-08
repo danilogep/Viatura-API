@@ -1,6 +1,7 @@
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
 
 # Classe Base para todos os modelos do SQLAlchemy
 class Base(DeclarativeBase):

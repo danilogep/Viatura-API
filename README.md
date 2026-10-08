@@ -1,171 +1,168 @@
-# 🚀 ViaturaAPI: Gerenciamento de Viaturas da PRF
+# ViaturaAPI — gestão de frota operacional
 
-[![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org)
-[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com)
+[![CI](https://github.com/danilogep/Viatura-API/actions/workflows/ci.yml/badge.svg)](https://github.com/danilogep/Viatura-API/actions/workflows/ci.yml)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-3776AB?logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-async-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![Licença MIT](https://img.shields.io/badge/licença-MIT-green)](LICENSE)
 
-Bem-vindo à **ViaturaAPI**, uma API RESTful desenvolvida em Python com FastAPI, projetada para gerenciar eficientemente as viaturas da Polícia Rodoviária Federal (PRF), seus planos de manutenção e as unidades operacionais.
+**O que resolve:** controla uma frota de veículos operacionais — quem está rodando, quem está na oficina, quem saiu da frota — e projeta o custo do ciclo de manutenção a partir dos planos vigentes.
+**Como rodar:** `cp .env.example .env && docker compose up --build` → API em `localhost:8000/docs`, interface em `localhost:5173`.
+**Interface:** [danilogep/viatura-frontend](https://github.com/danilogep/viatura-frontend) — React + TypeScript, consome esta API.
+**Em um print:**
 
-Este projeto foi construído para demonstrar conceitos modernos de desenvolvimento de APIs, incluindo integração com banco de dados PostgreSQL, gerenciamento de migrações com Alembic, paginação de resultados e tratamento de erros customizado.
-
-> **Nota:** Este repositório contém o BACKEND (API). Para ver a interface visual, acesse o repositório do Frontend.
-
----
-
-### 🌟 Novas Funcionalidades (v2.0)
-
-* **💰 Inteligência Financeira:**
-    * Cálculo automático de previsão orçamentária baseado nos planos de manutenção ativos.
-    * Registro de valores estimados para serviços preventivos e corretivos.
-
-* **🚦 Controle de Status Operacional:**
-    * Monitoramento em tempo real: Saiba quantas viaturas estão **"Em Operação"** vs **"Em Manutenção"**.
-    * Lógica de negócios para impedir alocação de viaturas baixadas.
-
-* **🔍 Filtros Avançados:**
-    * Busca otimizada por Placa, Modelo e Status.
-    * Paginação eficiente para grandes volumes de dados.
-
-* **🛡️ Segurança e Robustez:**
-    * Tratamento de erros de banco de dados (Integrity Error).
-    * Prevenção contra Race Conditions (Condição de Corrida) no cadastro.
-    * Configuração segura de CORS para integração com Frontend moderno.
+![Painel de controle: frota ativa, previsão de gastos e veículos em manutenção.](img/02_dashboard.png)
 
 ---
 
-### 💻 Tecnologias Utilizadas
+## Subindo tudo com um comando
 
-* **Linguagem:** Python 3.12+
-* **Framework:** FastAPI (Alta performance e validação automática).
-* **Banco de Dados:** PostgreSQL (via Docker).
-* **ORM:** SQLAlchemy 2.0 (Gerenciamento de dados assíncrono).
-* **Migrações:** Alembic (Controle de versão do banco de dados).
-* **Ambiente:** Docker & Docker Compose.
-* **Validação:** Pydantic (Segurança e tipagem de dados).
----
-
-### 🚀 Primeiros Passos
-
-Siga estas instruções para configurar e executar a ViaturaAPI em seu ambiente local.
-
-#### 1. Pré-requisitos
-
-Certifique-se de ter os seguintes programas instalados em sua máquina:
-
-* **Python 3.12+**: [Download Python](https://www.python.org/downloads/)
-* **Docker Desktop**: [Download Docker](https://www.docker.com/products/docker-desktop/) (Inclui Docker Compose)
-* **Git**: [Download Git](https://git-scm.com/downloads)
-
-#### 2. Clone o Repositório
-
-Abra seu terminal (PowerShell no Windows, Terminal no Linux/macOS) e clone este repositório:
+A pilha inteira — Postgres, API e interface — está descrita em um único `docker-compose.yml`.
 
 ```bash
-git clone [https://github.com/seu-usuario/Viatura_API.git](https://github.com/seu-usuario/Viatura_API.git)
-cd Viatura_API
+git clone https://github.com/danilogep/Viatura-API.git
+git clone https://github.com/danilogep/viatura-frontend.git   # irmão, lado a lado
+cd Viatura-API
+cp .env.example .env
+docker compose up --build
 ```
 
-#### 3. Configuração do Ambiente
+| Serviço | Endereço |
+|---|---|
+| Documentação interativa (Swagger) | http://localhost:8000/docs |
+| Interface | http://localhost:5173 |
+| Banco | `localhost:5432` |
 
-##### a. Ambiente Virtual
-
-Crie e ative um ambiente virtual para o projeto:
+Para popular o banco com 5 unidades, 4 planos e 50 viaturas:
 
 ```bash
-# Criar o ambiente virtual
-python -m venv venv
-
-# Ativar o ambiente virtual (Windows PowerShell)
-.\venv\Scripts\Activate.ps1
-
-# Ativar o ambiente virtual (Linux/macOS)
-# source venv/bin/activate
+docker compose --profile seed up seed
 ```
 
-##### b. Instale as Dependências
+O compose espera o frontend em `../viatura-frontend`. Se ele estiver em outro lugar, ajuste `FRONTEND_PATH` no `.env`.
 
-Com o ambiente virtual ativado, instale todas as bibliotecas necessárias:
+<details>
+<summary>Rodar sem Docker</summary>
 
 ```bash
+python -m venv venv && venv/Scripts/activate      # Linux/macOS: source venv/bin/activate
 pip install -r requirements.txt
-```
-
-#### 4. Inicie o Banco de Dados (PostgreSQL com Docker)
-
-Nós usamos Docker para manter o banco de dados isolado e fácil de configurar.
-
-```bash
-docker compose up -d
-
-# 2. Criar tabelas e popular dados (Seed)
-python seed.py
-```
-
-Este comando irá baixar a imagem do PostgreSQL (se ainda não tiver) e iniciar o container do banco de dados em segundo plano.
-
-#### 5. Execute as Migrações do Banco de Dados
-
-Com o banco de dados rodando, use o Alembic para criar as tabelas no PostgreSQL:
-
-```bash
+cp .env.example .env                              # aponte DB_URL para o seu Postgres
 alembic upgrade head
-```
-
-Você verá mensagens informando que as tabelas `plano_de_manutencaos`, `unidade_operacionals` e `viaturas` foram criadas.
-
----
-
-### 🌐 Utilizando a API
-
-Com todas as configurações feitas, é hora de rodar a API e começar a interagir com ela!
-
-#### 1. Inicie o Servidor da API
-
-No seu terminal (com o ambiente virtual ainda ativado), inicie o servidor FastAPI:
-
-```bash
+python seed.py
 uvicorn main:app --reload --port 8000
 ```
-
-Você verá uma mensagem indicando que o Uvicorn está rodando em `http://127.0.0.1:8000`.
-
-#### 2. Acesse a Documentação Interativa (Swagger UI)
-
-Abra seu navegador e acesse a documentação interativa da API:
-
-➡️ **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**
-
-Você também pode acessar a documentação ReDoc em [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc).
-
-Aqui você encontrará todos os *endpoints* disponíveis, exemplos de requisições e poderá testar a API diretamente pelo navegador.
+</details>
 
 ---
 
-### 🛑 Parando o Ambiente
+## A API
 
-Para parar o servidor FastAPI, pressione `CTRL + C` no terminal onde ele está rodando.
+![Swagger UI com os endpoints de viaturas, unidades operacionais, planos de manutenção e health.](img/01_swagger.png)
 
-Para parar e remover os containers do Docker (e opcionalmente os dados do banco de dados), use:
+| Método | Rota | O que faz |
+|---|---|---|
+| `POST` | `/viaturas/` | Cadastra e aloca um veículo |
+| `GET` | `/viaturas/` | Lista paginada, com filtro por `modelo`, `placa` e `status` |
+| `GET` | `/viaturas/previsao-orcamentaria` | Composição da frota e custo previsto |
+| `GET` | `/viaturas/{id}` | Consulta por ID |
+| `PATCH` | `/viaturas/{id}/status` | Move entre `OPERACAO`, `MANUTENCAO` e `BAIXADA` |
+| `PATCH` | `/viaturas/{id}/alocacao` | Transfere para outra unidade |
+| `GET/POST` | `/uops/`, `/planos/` | Cadastros de apoio |
+| `GET` | `/health` | Usado pelo healthcheck do compose |
 
-```bash
-# Para parar os containers
-docker compose stop
+---
 
-# Para parar e remover os containers e a rede (mantém os dados)
-docker compose down
+## As duas decisões que sustentam o projeto
 
-# Para parar e remover TUDO (containers, rede, e VOLUMES com os dados do banco!)
-docker compose down -v
+**1. Baixa é estado terminal.**
+
+Um veículo baixado saiu da frota. Se a API permitisse realocá-lo, ele reapareceria no efetivo de uma unidade e voltaria a pesar na previsão orçamentária — exatamente o número que a baixa deveria reduzir. Então:
+
+```http
+PATCH /viaturas/7/alocacao   →  409  "Viatura ABC1D23 está baixada e não pode ser
+                                      alocada a uma unidade operacional."
+PATCH /viaturas/7/status     →  409  "Viatura baixada não retorna à frota:
+     {"status": "OPERACAO"}            a baixa é definitiva."
 ```
 
+A regra tem arquivo de teste próprio: [`tests/test_regra_viatura_baixada.py`](tests/test_regra_viatura_baixada.py).
+
+**2. O orçamento é agregado no banco, não somado no cliente.**
+
+A versão anterior do painel pedia a primeira página da listagem e somava o custo dos itens recebidos. Com a frota acima do tamanho da página, o número saía menor que o real e ninguém percebia. O cálculo foi para uma rota própria, em SQL:
+
+```bash
+curl localhost:8000/viaturas/previsao-orcamentaria
+```
+```json
+{
+  "total_viaturas": 50,
+  "em_operacao": 33,
+  "em_manutencao": 13,
+  "baixadas": 4,
+  "previsao_orcamentaria": 105000.0
+}
+```
+
+Viatura em manutenção **continua** no orçamento — manutenção é quando o custo se realiza. Viatura baixada **sai**. Os dois casos estão travados em [`tests/test_previsao_orcamentaria.py`](tests/test_previsao_orcamentaria.py).
+
 ---
 
-### 🤝 Integração Frontend
-Este backend foi desenhado para alimentar o *Viatura Frontend*, desenvolvido em React + TypeScript. Certifique-se de que este backend esteja rodando na porta 8000 para que o frontend funcione corretamente.
+## Testes
+
+```bash
+pip install -r requirements-dev.txt
+pytest --cov
+```
+
+A suíte roda contra SQLite em memória, criado e destruído por teste: **não é preciso subir banco nenhum antes.** São 35 testes cobrindo cadastro, filtros, paginação, as regras de baixa e o agregado orçamentário.
+
+```
+viatura/controller.py      76 stmts    0 miss   100%
+viatura/schemas.py         47 stmts    0 miss   100%
+TOTAL                     303 stmts   15 miss    95%
+```
+
+O mesmo comando roda no CI a cada push, com `--cov-fail-under=85`.
 
 ---
 
-### 🤝 Contribuição
+## Stack
 
-Contribuições são bem-vindas! Sinta-se à vontade para abrir *issues* ou enviar *pull requests*.
+| Camada | Escolha |
+|---|---|
+| API | FastAPI + Pydantic v2 |
+| Persistência | SQLAlchemy 2.0 assíncrono + asyncpg |
+| Banco | PostgreSQL 15 |
+| Migrações | Alembic |
+| Paginação | fastapi-pagination |
+| Testes | pytest + pytest-asyncio + httpx (ASGITransport) |
+| Lint | ruff |
+| Empacotamento | Docker + Docker Compose |
+
+## Configuração
+
+Tudo por variável de ambiente; veja [`.env.example`](.env.example). Não há credencial no código nem no `docker-compose.yml`.
+
+| Variável | Para que serve |
+|---|---|
+| `DB_URL` | Conexão do SQLAlchemy |
+| `CORS_ORIGINS` | Origens liberadas, separadas por vírgula |
+| `SQL_ECHO` | Ecoa o SQL no console (`false` por padrão) |
+
+## Estrutura
+
+```
+main.py                  aplicação, CORS e lifespan
+contrib/                 Base dos models, schemas e sessão
+viatura/                 model, schemas e controller do agregado principal
+unidade_operacional/     cadastro das unidades
+plano_manutencao/        cadastro dos planos e seus custos
+alembic/                 migrações
+tests/                   suíte pytest
+seed.py                  massa de desenvolvimento
+```
+
+## Licença
+
+[MIT](LICENSE).
