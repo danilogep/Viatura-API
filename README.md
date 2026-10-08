@@ -1,87 +1,89 @@
-# 💻 Viatura Frontend: Dashboard de Gestão de Frotas
+# Viatura Frontend — painel de gestão de frota
 
-[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Chakra UI](https://img.shields.io/badge/Chakra%20UI-v3-319795?style=for-the-badge&logo=chakraui&logoColor=white)](https://chakra-ui.com/)
+[![CI](https://github.com/danilogep/viatura-frontend/actions/workflows/ci.yml/badge.svg)](https://github.com/danilogep/viatura-frontend/actions/workflows/ci.yml)
+[![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Licença MIT](https://img.shields.io/badge/licença-MIT-green)](LICENSE)
 
-Interface moderna e responsiva para o sistema de gestão de viaturas da PRF. Este projeto consome a **ViaturaAPI** para fornecer visualização de dados em tempo real, controle de custos e monitoramento operacional.
+**O que resolve:** dá rosto à gestão de frota — situação de cada veículo, custo previsto do ciclo de manutenção e busca instantânea sobre a frota inteira.
+**Como rodar:** `npm install && npm run dev` com a API no ar em `localhost:8000`.
+**Backend:** [danilogep/Viatura-API](https://github.com/danilogep/Viatura-API) — FastAPI + PostgreSQL. O `docker compose` de lá sobe os dois de uma vez.
+**Em um print:**
 
-> **Nota:** Este é o FRONTEND (Interface). Para funcionar, ele precisa do [Backend ViaturaAPI](https://github.com/SEU-USUARIO/Viatura_API) rodando localmente.
-
----
-
-### ✨ Funcionalidades Visuais
-
-* **📊 Dashboard Estratégico:**
-    * Cartões de métricas com indicadores de frota ativa, custos e viaturas em manutenção.
-    * Feedback visual de carregamento com *Skeletons*.
-    * Indicadores coloridos para status do sistema.
-
-* **🚙 Gestão de Viaturas:**
-    * Tabela interativa com listagem de veículos.
-    * **Barra de Pesquisa Instantânea:** Filtre por placa ou modelo em tempo real.
-    * **Badges Inteligentes:** Cores dinâmicas para status (Operação/Manutenção) e ano de fabricação.
-
-* **💰 Visualização Financeira:**
-    * Formatação automática de moeda (BRL/R$) para planos de manutenção.
-    * Indicadores claros de custos preventivos e corretivos.
+![Painel de controle: 33 veículos em operação, R$ 105.000,00 de previsão de gastos e 13 em manutenção.](img/01_dashboard.png)
 
 ---
 
-### 🛠️ Tecnologias Utilizadas
+## Rodando
 
-* **Linguagem:** TypeScript (Segurança e tipagem estática).
-* **Framework:** React 18 (Componentização).
-* **Build Tool:** Vite (Performance extrema no desenvolvimento).
-* **UI Kit:** Chakra UI v3 (Componentes acessíveis e tema customizável).
-* **HTTP Client:** Axios (Comunicação com a API).
-* **Roteamento:** React Router DOM.
-
----
-
-### 🚀 Como Rodar o Projeto
-
-#### 1. Pré-requisitos
-* Node.js 18+ instalado.
-* O **Backend** deve estar rodando na porta `8000` (Verifique o repositório da API).
-
-#### 2. Instalação
-
-Clone este repositório e instale as dependências:
+A forma mais curta é pelo repositório do backend, que tem um `docker compose` subindo banco, API e esta interface juntos. Para trabalhar só no frontend:
 
 ```bash
-# Clone o projeto
-git clone [https://github.com/SEU-USUARIO/Viatura-Frontend.git](https://github.com/SEU-USUARIO/Viatura-Frontend.git)
-cd Viatura-Frontend
-
-# Instale os pacotes (NPM)
+git clone https://github.com/danilogep/viatura-frontend.git
+cd viatura-frontend
 npm install
-```
-
-#### 3. Execução
-Inicie o servidor de desenvolvimento:
-
-```
+cp .env.example .env          # VITE_API_URL=http://localhost:8000
 npm run dev
 ```
 
-O terminal exibirá o link de acesso, geralmente: 👉 http://localhost:5173
+Abra http://localhost:5173. A API precisa estar no ar — sem ela o painel mostra um aviso em vez de números fantasiados.
 
-### ⚙️ Configuração da API
-A conexão com o Backend é gerenciada em src/services/api.ts. Por padrão, ele aponta para o endereço local do FastAPI:
+| Comando | O que faz |
+|---|---|
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm run build` | `tsc -b` + bundle de produção em `dist/` |
+| `npm run lint` | ESLint |
+| `npm run preview` | Serve o `dist/` já construído |
+
+---
+
+## As telas
+
+### Frota
+
+![Tabela da frota com placa, modelo, situação, unidade e plano de manutenção; badges verdes, laranja e vermelhos para OPERACAO, MANUTENCAO e BAIXADA.](img/02_frota.png)
+
+A cor do badge é a leitura rápida da tabela: verde em operação, laranja na oficina, vermelho fora da frota.
+
+### Busca instantânea
+
+![Busca por "hilux" reduzindo a tabela a quatro veículos.](img/03_busca.png)
+
+Filtra por placa ou modelo enquanto se digita, sem ida ao servidor.
+
+### Planos de manutenção
+
+![Tabela de planos com descrição técnica e custo estimado formatado em reais.](img/04_planos.png)
+
+Valores formatados em BRL com `Intl.NumberFormat` — a formatação de moeda é do navegador, não um `toFixed(2)` com `R$` colado na frente.
+
+---
+
+## Decisões
+
+**O endereço da API vem do ambiente.** `VITE_API_URL` é lida em [`src/services/api.ts`](src/services/api.ts) e cai em `http://localhost:8000` quando ausente. A mesma imagem Docker serve para apontar a um backend local, de homologação ou publicado — o valor entra como build-arg, porque o Vite resolve variáveis `VITE_*` em tempo de build.
+
+**O painel não soma no cliente.** Os números do dashboard vêm de `GET /viaturas/previsao-orcamentaria`, agregados em SQL. A versão anterior pedia a primeira página da listagem e somava os itens recebidos, o que subnotificava a previsão assim que a frota passava de 100 veículos.
+
+**Tipos espelham o contrato da API.** [`src/types/index.ts`](src/types/index.ts) declara `StatusViatura` como união literal (`'OPERACAO' | 'MANUTENCAO' | 'BAIXADA'`), e não `string`: um status novo no backend quebra a compilação aqui, que é onde se quer descobrir.
+
+---
+
+## Stack
+
+React 19 · TypeScript 5.9 · Vite 7 · Chakra UI v3 · Axios · React Router 7
+
+Build de produção servido por nginx ([`Dockerfile`](Dockerfile)), com fallback de SPA para que um F5 em `/viaturas` não devolva 404.
+
+## Estrutura
 
 ```
-baseURL: '[http://127.0.0.1:8000](http://127.0.0.1:8000)'
-``` 
+src/pages/        Dashboard, Viaturas, UOPs, Planos
+src/components/   Navbar e blocos reutilizáveis
+src/services/     instância do Axios
+src/types/        contrato compartilhado com a API
+```
 
-Caso precise alterar a porta ou o IP do servidor, modifique este arquivo.
+## Licença
 
-### 📂 Estrutura de Pastas
-* src/pages: Telas completas (Dashboard, Viaturas, UOPs, Planos).
-* src/components: Blocos reutilizáveis (Navbar, Cards, Tabelas).
-* src/services: Configuração do Axios.
-* src/types: Definições de Tipos (Interfaces TypeScript para Viatura, UOP, Plano).
-
-### 🤝 Contribuição
-Projeto desenvolvido com foco em Clean Code, componentização e usabilidade. Pull Requests são bem-vindos!
+[MIT](LICENSE).

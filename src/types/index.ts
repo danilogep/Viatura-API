@@ -1,3 +1,5 @@
+export type StatusViatura = 'OPERACAO' | 'MANUTENCAO' | 'BAIXADA';
+
 export interface Viatura {
   id: number;
   placa: string;
@@ -5,13 +7,13 @@ export interface Viatura {
   modelo: string;
   cor: string;
   ano_fabricacao: number;
-  status: string;
-  
+  status: StatusViatura;
+
   // Objetos aninhados para exibição (podem ser opcionais)
-  unidade_operacional?: { 
-    nome: string 
+  unidade_operacional?: {
+    nome: string
   };
-  plano_manutencao?: { 
+  plano_manutencao?: {
     nome: string;
     valor_estimado: number;
   };
@@ -32,4 +34,13 @@ export interface PlanoManutencao {
   nome: string;
   descricao: string;
   valor_estimado: number;
+}
+
+/** Resposta de GET /viaturas/previsao-orcamentaria — agregado calculado no banco. */
+export interface PrevisaoOrcamentaria {
+  total_viaturas: number;
+  em_operacao: number;
+  em_manutencao: number;
+  baixadas: number;
+  previsao_orcamentaria: number;
 }

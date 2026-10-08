@@ -22,3 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Ambiente virtual Python (nao pertence a este projeto)
+venv/
+.venv/
+
+# Variaveis de ambiente
+.env
+.env.local
+.env.*.local
+!.env.example
