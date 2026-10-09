@@ -32,6 +32,12 @@ docker compose up --build
 | Interface | http://localhost:5173 |
 | Banco | `localhost:5432` |
 
+Se alguma dessas portas já estiver ocupada, troque sem editar arquivo nenhum:
+
+```bash
+API_PORT=8010 FRONTEND_PORT=5183 POSTGRES_PORT=5442 docker compose up -d
+```
+
 Para popular o banco com 5 unidades, 4 planos e 50 viaturas:
 
 ```bash

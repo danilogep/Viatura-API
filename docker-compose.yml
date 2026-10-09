@@ -2,6 +2,12 @@
 #
 # O frontend vive em outro repositório (viatura-frontend). Clone os dois lado a
 # lado ou aponte FRONTEND_PATH no .env para onde ele estiver.
+#
+# As portas publicadas sao variaveis porque e comum ter outro projeto ocupando
+# a 8000 ou a 5432. Para subir em outras:
+#   API_PORT=8010 FRONTEND_PORT=5183 POSTGRES_PORT=5442 docker compose up -d
+# Mudar API_PORT exige ajustar VITE_API_URL junto, senao a interface continua
+# chamando a porta antiga.
 
 services:
   db:
@@ -12,7 +18,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-viatura}
       POSTGRES_DB: ${POSTGRES_DB:-viatura_db}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
     healthcheck:
@@ -28,10 +34,10 @@ services:
     container_name: viatura_api
     environment:
       DB_URL: postgresql+asyncpg://${POSTGRES_USER:-viatura}:${POSTGRES_PASSWORD:-viatura}@db:5432/${POSTGRES_DB:-viatura_db}
-      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:${FRONTEND_PORT:-5173},http://127.0.0.1:${FRONTEND_PORT:-5173}}
       SQL_ECHO: ${SQL_ECHO:-false}
     ports:
-      - "8000:8000"
+      - "${API_PORT:-8000}:8000"
     depends_on:
       db:
         condition: service_healthy
@@ -58,10 +64,10 @@ services:
     build:
       context: ${FRONTEND_PATH:-../viatura-frontend}
       args:
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:${API_PORT:-8000}}
     container_name: viatura_frontend
     ports:
-      - "5173:80"
+      - "${FRONTEND_PORT:-5173}:80"
     depends_on:
       api:
         condition: service_healthy
