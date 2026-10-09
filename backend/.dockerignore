@@ -9,5 +9,11 @@ __pycache__/
 htmlcov/
 tests/
 img/
-.env
+.env*
+*.env
+*.db
+*.sqlite3
+*.log
+coverage.xml
+.ruff_cache/
 README.md

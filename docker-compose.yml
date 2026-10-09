@@ -1,18 +1,11 @@
-# Sobe a pilha inteira — banco, API e interface — com `docker compose up --build`.
-#
-# O frontend vive em outro repositório (viatura-frontend). Clone os dois lado a
-# lado ou aponte FRONTEND_PATH no .env para onde ele estiver.
-#
-# As portas publicadas sao variaveis porque e comum ter outro projeto ocupando
-# a 8000 ou a 5432. Para subir em outras:
-#   API_PORT=8010 FRONTEND_PORT=5183 POSTGRES_PORT=5442 docker compose up -d
-# Mudar API_PORT exige ajustar VITE_API_URL junto, senao a interface continua
-# chamando a porta antiga.
+# Execute na raiz: docker compose up --build
+# Mantém o nome do projeto anterior para preservar a associação com pg_data.
+# Use `docker compose -p outro-nome ...` para uma instância isolada.
+name: viatura_api
 
 services:
   db:
     image: postgres:15-alpine
-    container_name: viatura_db
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-viatura}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-viatura}
@@ -30,8 +23,7 @@ services:
       retries: 10
 
   api:
-    build: .
-    container_name: viatura_api
+    build: ./backend
     environment:
       DB_URL: postgresql+asyncpg://${POSTGRES_USER:-viatura}:${POSTGRES_PASSWORD:-viatura}@db:5432/${POSTGRES_DB:-viatura_db}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:${FRONTEND_PORT:-5173},http://127.0.0.1:${FRONTEND_PORT:-5173}}
@@ -51,7 +43,7 @@ services:
   seed:
     # Popula o banco uma vez e encerra. Roda sob o perfil `seed` para não
     # recriar as tabelas a cada `up`: `docker compose --profile seed up seed`.
-    build: .
+    build: ./backend
     profiles: ["seed"]
     environment:
       DB_URL: postgresql+asyncpg://${POSTGRES_USER:-viatura}:${POSTGRES_PASSWORD:-viatura}@db:5432/${POSTGRES_DB:-viatura_db}
@@ -62,10 +54,9 @@ services:
 
   frontend:
     build:
-      context: ${FRONTEND_PATH:-../viatura-frontend}
+      context: ./frontend
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:${API_PORT:-8000}}
-    container_name: viatura_frontend
     ports:
       - "${FRONTEND_PORT:-5173}:80"
     depends_on:

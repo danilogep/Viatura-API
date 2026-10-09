@@ -1,93 +1,78 @@
-# Viatura Frontend — painel de gestão de frota
+# Frontend — VIATURA
 
-[![CI](https://github.com/danilogep/viatura-frontend/actions/workflows/ci.yml/badge.svg)](https://github.com/danilogep/viatura-frontend/actions/workflows/ci.yml)
-[![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Licença MIT](https://img.shields.io/badge/licença-MIT-green)](LICENSE)
+Interface de gestão de frota em **React 19, TypeScript, Vite e Chakra UI**.
+Parte do [projeto unificado](../README.md), consumindo a [API Python](../backend/README.md).
 
-**O que resolve:** dá rosto à gestão de frota — situação de cada veículo, custo previsto do ciclo de manutenção e busca instantânea sobre a frota inteira.
-**Como rodar:** `npm install && npm run dev` com a API no ar em `localhost:8000`.
-**Backend:** [danilogep/Viatura-API](https://github.com/danilogep/Viatura-API) — FastAPI + PostgreSQL. O `docker compose` de lá sobe os dois de uma vez.
-**Em um print:**
+![Dashboard da frota.](img/01_dashboard.png)
 
-![Painel de controle: 33 veículos em operação, R$ 105.000,00 de previsão de gastos e 13 em manutenção.](img/01_dashboard.png)
+## Desenvolvimento local
 
----
-
-## Rodando
-
-A forma mais curta é pelo repositório do backend, que tem um `docker compose` subindo banco, API e esta interface juntos. Para trabalhar só no frontend:
+Requisito: Node.js 22. Partindo da raiz do repositório:
 
 ```bash
-git clone https://github.com/danilogep/viatura-frontend.git
-cd viatura-frontend
-npm install
-cp .env.example .env          # VITE_API_URL=http://localhost:8000
+cd frontend
+npm ci
+cp .env.example .env
 npm run dev
 ```
 
-Abra http://localhost:5173. A API precisa estar no ar — sem ela o painel mostra um aviso em vez de números fantasiados.
+No PowerShell, use `Copy-Item .env.example .env`.
+A API precisa estar acessível em `http://localhost:8000`, ou no endereço definido
+em `VITE_API_URL`. A interface abre por padrão em http://localhost:5173.
 
-| Comando | O que faz |
+## Comandos
+
+Execute dentro de `frontend/`:
+
+| Comando | Função |
 |---|---|
-| `npm run dev` | Servidor de desenvolvimento |
-| `npm run build` | `tsc -b` + bundle de produção em `dist/` |
+| `npm run dev` | Servidor Vite de desenvolvimento |
 | `npm run lint` | ESLint |
-| `npm run preview` | Serve o `dist/` já construído |
+| `npx tsc --noEmit -p tsconfig.app.json` | Checagem de tipos da aplicação |
+| `npm run build` | Compilação TypeScript e bundle de produção |
+| `npm run preview` | Visualização local do bundle |
 
----
-
-## As telas
-
-### Frota
-
-![Tabela da frota com placa, modelo, situação, unidade e plano de manutenção; badges verdes, laranja e vermelhos para OPERACAO, MANUTENCAO e BAIXADA.](img/02_frota.png)
-
-A cor do badge é a leitura rápida da tabela: verde em operação, laranja na oficina, vermelho fora da frota.
-
-### Busca instantânea
-
-![Busca por "hilux" reduzindo a tabela a quatro veículos.](img/03_busca.png)
-
-Filtra por placa ou modelo enquanto se digita, sem ida ao servidor.
-
-### Planos de manutenção
-
-![Tabela de planos com descrição técnica e custo estimado formatado em reais.](img/04_planos.png)
-
-Valores formatados em BRL com `Intl.NumberFormat` — a formatação de moeda é do navegador, não um `toFixed(2)` com `R$` colado na frente.
-
----
-
-## Decisões
-
-**O endereço da API vem do ambiente.** `VITE_API_URL` é lida em [`src/services/api.ts`](src/services/api.ts) e cai em `http://localhost:8000` quando ausente. A mesma imagem Docker serve para apontar a um backend local, de homologação ou publicado — o valor entra como build-arg, porque o Vite resolve variáveis `VITE_*` em tempo de build.
-
-**O painel não soma no cliente.** Os números do dashboard vêm de `GET /viaturas/previsao-orcamentaria`, agregados em SQL. A versão anterior pedia a primeira página da listagem e somava os itens recebidos, o que subnotificava a previsão assim que a frota passava de 100 veículos.
-
-**Tipos espelham o contrato da API.** [`src/types/index.ts`](src/types/index.ts) declara `StatusViatura` como união literal (`'OPERACAO' | 'MANUTENCAO' | 'BAIXADA'`), e não `string`: um status novo no backend quebra a compilação aqui, que é onde se quer descobrir.
-
----
-
-## Stack
-
-React 19 · TypeScript 5.9 · Vite 7 · Chakra UI v3 · Axios · React Router 7
-
-Build de produção servido por nginx ([`Dockerfile`](Dockerfile)), com fallback de SPA para que um F5 em `/viaturas` não devolva 404.
+Para executar tudo em Docker, use o Compose na [raiz](../README.md), que constrói
+esta imagem e inicia a API e o banco.
 
 ## Estrutura
 
+```text
+src/
+├── pages/        Dashboard, veículos, unidades e planos
+├── components/   Navegação e componentes compartilhados
+├── services/     Cliente Axios e acesso à API
+├── types/        Contratos TypeScript usados pela interface
+├── App.tsx       Rotas da aplicação
+└── main.tsx      Inicialização do React
 ```
-src/pages/        Dashboard, Viaturas, UOPs, Planos
-src/components/   Navbar e blocos reutilizáveis
-src/services/     instância do Axios
-src/types/        contrato compartilhado com a API
-```
 
-## Licença
+## Telas e comportamento
 
-[MIT](LICENSE).
+- Dashboard: frota ativa, veículos em manutenção e previsão de gastos da API.
+- Viaturas: lista, busca e situação dos veículos.
+- Unidades: cadastro das unidades operacionais.
+- Planos: cadastro dos planos e seus custos estimados.
 
----
+![Lista de veículos.](img/02_frota.png)
+![Planos de manutenção.](img/04_planos.png)
 
-<sub>Parte do meu portfólio — mais projetos em **[github.com/danilogep](https://github.com/danilogep)** · [LinkedIn](https://linkedin.com/in/danilogep)</sub>
+Os tipos em `src/types/` representam o contrato esperado, mas não são gerados
+automaticamente a partir da API. Ao mudar o contrato Python, revise-os junto com
+os consumidores em `src/services/` e `src/pages/`.
+
+## Build e configuração
+
+`VITE_API_URL` é resolvida **durante o build** e fica pública no JavaScript.
+Não use variáveis `VITE_*` para senhas ou tokens privados. Alterar o endereço
+exige um novo build.
+
+O Dockerfile compila a aplicação e entrega o resultado via nginx. O
+`nginx.conf` mantém o fallback de SPA: abrir ou atualizar `/viaturas` serve
+`index.html` e deixa o React resolver a rota.
+
+## Histórico
+
+O código do antigo repositório `viatura-frontend` foi incorporado aqui com seu
+histórico Git completo. Todas as alterações futuras pertencem ao repositório
+[Viatura-API](https://github.com/danilogep/Viatura-API).

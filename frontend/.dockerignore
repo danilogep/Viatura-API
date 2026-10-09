@@ -2,7 +2,11 @@
 .github
 node_modules
 venv
+.venv
 dist
-.env
+.env*
+*.env
+*.log
+*.tsbuildinfo
 img
 README.md

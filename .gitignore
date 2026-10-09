@@ -29,3 +29,16 @@ htmlcov/
 
 # Alembic
 .alembic_cache/
+
+# Frontend
+node_modules/
+dist/
+dist-ssr/
+*.tsbuildinfo
+
+# Ambientes locais e logs de qualquer camada
+.env.*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db
