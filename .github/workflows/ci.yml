@@ -30,11 +30,10 @@ jobs:
         # A suíte roda contra SQLite em memória: não há serviço de banco a subir.
         run: |
           set -o pipefail
-          pytest --cov --cov-report=term-missing --cov-report=xml --cov-fail-under=85             2>&1 | tee pytest.log
+          pytest --cov --cov-report=term-missing --cov-report=xml --cov-fail-under=85 2>&1 | tee pytest.log
 
       - name: Resumo da execução
-        # Duas saidas: o resumo do job (legivel na interface) e uma anotacao de
-        # erro, que e o que aparece sem precisar abrir o log inteiro.
+        # A saida do pytest vai para o resumo do job, visivel sem abrir o log.
         if: always()
         run: |
           {
@@ -43,13 +42,6 @@ jobs:
             tail -n 80 pytest.log 2>/dev/null || echo 'pytest nao chegou a escrever saida'
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Anotar a falha
-        if: failure()
-        run: |
-          msg=$(tail -n 40 pytest.log 2>/dev/null | sed ':a;N;$!ba;s/
-/%0A/g')
-          echo "::error title=pytest::${msg:-pytest nao produziu saida}"
 
       - name: Publicar relatório de cobertura
         if: always()
