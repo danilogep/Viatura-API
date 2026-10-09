@@ -28,14 +28,31 @@ jobs:
 
       - name: Pytest com cobertura
         # A suíte roda contra SQLite em memória: não há serviço de banco a subir.
-        run: pytest --cov --cov-report=term-missing --cov-report=xml --cov-fail-under=85
+        run: |
+          set -o pipefail
+          pytest --cov --cov-report=term-missing --cov-report=xml --cov-fail-under=85             2>&1 | tee pytest.log
+
+      - name: Resumo da execução
+        # Vai para o resumo do job, que fica visivel sem abrir o log inteiro —
+        # e e o unico lugar que a API do GitHub expoe sem autenticacao.
+        if: always()
+        run: |
+          {
+            echo '### Pytest'
+            echo '```'
+            tail -n 60 pytest.log 2>/dev/null || echo 'pytest nao chegou a escrever saida'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publicar relatório de cobertura
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cobertura
-          path: coverage.xml
+          path: |
+            coverage.xml
+            pytest.log
+          if-no-files-found: warn
 
   imagem:
     name: Build da imagem Docker
