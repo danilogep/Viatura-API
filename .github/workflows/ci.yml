@@ -33,16 +33,23 @@ jobs:
           pytest --cov --cov-report=term-missing --cov-report=xml --cov-fail-under=85             2>&1 | tee pytest.log
 
       - name: Resumo da execução
-        # Vai para o resumo do job, que fica visivel sem abrir o log inteiro —
-        # e e o unico lugar que a API do GitHub expoe sem autenticacao.
+        # Duas saidas: o resumo do job (legivel na interface) e uma anotacao de
+        # erro, que e o que aparece sem precisar abrir o log inteiro.
         if: always()
         run: |
           {
             echo '### Pytest'
             echo '```'
-            tail -n 60 pytest.log 2>/dev/null || echo 'pytest nao chegou a escrever saida'
+            tail -n 80 pytest.log 2>/dev/null || echo 'pytest nao chegou a escrever saida'
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Anotar a falha
+        if: failure()
+        run: |
+          msg=$(tail -n 40 pytest.log 2>/dev/null | sed ':a;N;$!ba;s/
+/%0A/g')
+          echo "::error title=pytest::${msg:-pytest nao produziu saida}"
 
       - name: Publicar relatório de cobertura
         if: always()
